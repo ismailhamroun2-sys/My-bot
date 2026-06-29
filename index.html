@@ -383,7 +383,6 @@
             overflow: hidden;
             box-shadow: var(--card-shadow);
             cursor: pointer;
-            group: hover;
         }
         .hero-img-container {
             width: 100%;
@@ -691,26 +690,450 @@
             padding: 12px;
             background-color: var(--accent-color);
             color: #ffffff;
-            border: none
-;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .newsletter-form button:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+        }
+
+        /* نظام القائمة الجانبية للهواتف */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background-color: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            z-index: 10000;
+            padding: 40px 25px;
+            transition: var(--transition-smooth);
+            box-shadow: var(--card-shadow);
+        }
+        .mobile-sidebar.active {
+            right: 0;
+        }
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-bottom: 30px;
+            display: block;
+        }
+        .mobile-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .mobile-nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+        .mobile-nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        /* الفوتر (أسفل الموقع) */
+        footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 60px 4%;
+            margin-top: 60px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .footer-col h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 0;
+            width: 30px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+        .footer-col p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+        }
+        .footer-links a:hover {
+            color: var(--accent-color);
+            padding-right: 5px;
+        }
+        .footer-bottom {
+            max-width: 1600px;
+            margin: 40px auto 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* التجاوب مع الشاشات (Responsive) */
+        @media (max-width: 1200px) {
+            .hero-section, .layout-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-main, .hero-sidebar {
+                height: auto;
+            }
+            .hero-main {
+                height: 450px;
+            }
+            .sidebar-card {
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                padding: 15px 5%;
+            }
+            .search-container, .main-nav {
+                display: none;
+            }
+            .burger-menu {
+                display: flex;
+            }
+            .ticker-wrap {
+                margin-top: 75px;
+            }
+            .news-cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            .hero-overlay {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="preloader" id="preloader">
+        <div class="loader-logo">
+            <span>أشنو واقع</span> Achnou Waqe3
+        </div>
+    </div>
 
-    <!-- شريط التنقل العلوي -->
-    <header>
+    <header id="mainHeader">
         <div class="header-top">
-            <a href="#" class="logo"><div class="logo-box">Achnou Waqe3</div></a>
+            <a href="#" class="logo" onclick="switchPage('home')">
+                <div class="logo-box">أشنو واقع</div>
+                <span>Achnou Waqe3</span>
+            </a>
+            <div class="header-actions">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن خبر أو موضوع...">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="تبديل المظهر">
+                    <svg id="themeIcon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+                </button>
+                <button class="burger-menu" id="burgerMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+        <div class="nav-container">
+            <ul class="main-nav">
+                <li class="nav-item active" id="nav-home"><a href="#" class="nav-link" onclick="switchPage('home')">الرئيسية</a></li>
+                <li class="nav-item" id="nav-morocco"><a href="#" class="nav-link" onclick="switchPage('morocco')">أخبار المغرب</a></li>
+                <li class="nav-item" id="nav-world"><a href="#" class="nav-link" onclick="switchPage('world')">سياسة عالمية</a></li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">تقنية وعلوم ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" class="dropdown-link" onclick="switchPage('tech')">ذكاء اصطناعي وبرمجة</a></li>
+                        <li><a href="#" class="dropdown-link" onclick="switchPage('games')">ألعاب إلكترونية وجيمينج</a></li>
+                        <li class="dropdown-item">
+                            <a href="#" class="dropdown-link">أنظمة التشغيل ◂</a>
+                            <ul class="nested-dropdown">
+                                <li><a href="#" class="dropdown-link" onclick="switchPage('linux')">لينكس وسيرفرات</a></li>
+                                <li><a href="#" class="dropdown-link" onclick="switchPage('android')">أندرويد وتيرمكس</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item" id="nav-sports"><a href="#" class="nav-link" onclick="switchPage('sports')">رياضة وكورة</a></li>
+                <li class="nav-item" id="nav-art"><a href="#" class="nav-link" onclick="switchPage('art')">ثقافة وفن</a></li>
+            </ul>
         </div>
     </header>
 
-    <!-- محتوى تجريبي بسيط للتأكد من اشتغال الموقع -->
-    <main style="margin-top: 100px; text-align: center; padding: 50px;">
-        <h1 style="color: #e50914; font-size: 2.5rem; margin-bottom: 20px;">موقع أشنو واقع الإخباري</h1>
-        <p style="font-size: 1.2rem; color: #ffffff;">مرحباً بك يا إسماعيل! الموقع شغال دابا بنجاح. الكود اللي حطيتي قبيلة كان ناقص ومقطوع، تقدر دابا تطلب الكود كامل مقسم باش تحط المنصة الكبرى ديالك.</p>
-    </main>
+    <div class="ticker-wrap">
+        <div class="ticker-title">💥 عاجل الآن</div>
+        <div class="ticker-inner" id="tickerInner">
+            <a href="#" class="ticker-item">منصة "أشنو واقع" تطلق واجهتها العالمية الكبرى لتغطية الأخبار على مدار 24 ساعة...</a>
+            <a href="#" class="ticker-item">تحديثات أمنية هامة في توزيعات لينكس وأنظمة أندرويد لحماية السيرفرات الشخصية...</a>
+            <a href="#" class="ticker-item">انطلاق الموسم الكروي الجديد وسط ترقب لصفقات كبرى في الدوريات العالمية...</a>
+            <a href="#" class="ticker-item">الذكاء الاصطناعي يقتحم مجالات المونتاج وصناعة المحتوى المرئي بدقة غير مسبوقة...</a>
+        </div>
+    </div>
 
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <button class="close-sidebar" id="closeSidebar">✕ إغلاق</button>
+        <ul class="mobile-nav-list">
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('home')">الرئيسية</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('morocco')">أخبار المغرب</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('world')">سياسة عالمية</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('tech')">الذكاء الاصطناعي</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('games')">الجيمينج والألعاب</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('linux')">تيرمكس ولينكس</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('sports')">رياضة وكورة</a></li>
+            <li><a href="#" class="mobile-nav-link" onclick="switchPage('art')">ثقافة وفن</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <div id="page-home" class="spa-page active">
+            <div class="hero-section">
+                <div class="hero-main">
+                    <div class="hero-img-container">
+                        <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200&auto=format&fit=crop&q=80" alt="الخبر الرئيسي">
+                    </div>
+                    <div class="hero-overlay">
+                        <span class="meta-tag">حدث اليوم</span>
+                        <h2 class="hero-title">منصة "أشنو واقع" الإخبارية تدشن انطلاقتها الرقمية الرسمية بأحدث التقنيات العالمية</h2>
+                        <p class="hero-desc">في خطوة تهدف إلى إثراء المحتوى الإخباري الرقمي، تم إطلاق منصة أشنو واقع لتغطية شاملة للمستجدات الوطنية والدولية بالاعتماد على تصميم متجاوب وسريع يناسب جميع الأجهزة الذكية.</p>
+                        <div class="post-meta-info">
+                            <span>⏱️ منذ ساعتين</span>
+                            <span>👁️ 15,400 مشاهدة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-sidebar">
+                    <div class="sidebar-card">
+                        <div class="side-img-box">
+                            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=80" alt="أمن معلوماتي">
+                        </div>
+                        <div class="side-content-box">
+                            <span class="meta-tag" style="background-color: #007bff;">حماية</span>
+                            <h3 class="side-title">دليل شامل لحماية السيرفرات الشخصية وأنظمة لينكس من الاختراقات</h3>
+                            <div class="post-meta-info"><span>⏱️ منذ 4 ساعات</span></div>
+                        </div>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="side-img-box">
+                            <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500&auto=format&fit=crop&q=80" alt="جيمينج">
+                        </div>
+                        <div class="side-content-box">
+                            <span class="meta-tag" style="background-color: #28a745;">جيمينج</span>
+                            <h3 class="side-title">ترتيب أفضل التشكيلات والخطط التكتيكية للوصول إلى القسم الأول في eFootball</h3>
+                            <div class="post-meta-info"><span>⏱️ منذ 6 ساعات</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout-grid">
+                <div class="news-zone">
+                    <div class="section-headline">
+                        <h2>آخر المستجدات والأخبار</h2>
+                    </div>
+                    <div class="news-cards-grid">
+                        <div class="news-card">
+                            <div class="card-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80" alt="ذكاء اصطناعي">
+                            </div>
+                            <div class="card-body">
+                                <span class="meta-tag">تكنولوجيا</span>
+                                <h3 class="card-title">كيفية إعداد سيرفرات محلية وتشغيل بوتات مستقلة 24 ساعة عبر خوادم السحاب</h3>
+                                <p class="card-text">شرح تقني مبسط للمطورين حول طريقة استغلال بيئات العمل الافتراضية والسكريبتات المتقدمة لضمان اشتغال الخدمات البرمجية دون انقطاع وبأقل الموارد الممكنة.</p>
+                                <div class="post-meta-info"><span>⏱️ اليوم</span></div>
+                            </div>
+                        </div>
+
+                        <div class="news-card">
+                            <div class="card-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&auto=format&fit=crop&q=80" alt="كورة">
+                            </div>
+                            <div class="card-body">
+                                <span class="meta-tag" style="background-color: #ffc107; color: #000;">رياضة</span>
+                                <h3 class="card-title">حصيلة الميركاتو الصيفي وتوقعات المنافسة على الألقاب المحلية والدولية</h3>
+                                <p class="card-text">قراءة تحليلية في آخر صفقات الأندية الكبرى واستعدادات الفرق لخوض غمار مباريات الموسم الجديد وسط تطلعات الجماهير الشغوفة.</p>
+                                <div class="post-meta-info"><span>⏱️ اليوم</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-sidebar">
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">الأكثر قراءة الآن</h3>
+                        <div class="mini-list">
+                            <div class="mini-item">
+                                <div class="mini-counter">01</div>
+                                <div class="mini-details">
+                                    <h4>إعداد محاكيات الأنظمة على الهواتف الذكية واستخدام أدوات المطورين</h4>
+                                </div>
+                            </div>
+                            <div class="mini-item">
+                                <div class="mini-counter">02</div>
+                                <div class="mini-details">
+                                    <h4>استراتيجيات تحسين الأداء والحساسية في ألعاب الباتل رويال السريعة</h4>
+                                </div>
+                            </div>
+                            <div class="mini-item">
+                                <div class="mini-counter">03</div>
+                                <div class="mini-details">
+                                    <h4>خطوات المونتاج الاحترافي وصناعة الفيديوهات الأكثر انتشاراً</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-widget newsletter-widget">
+                        <h3 class="widget-title">النشرة البريدية</h3>
+                        <p>توصل بآخر الأخبار العاجلة والتقارير الحصرية مباشرة في بريدك الإلكتروني.</p>
+                        <div class="newsletter-form">
+                            <input type="email" placeholder="أدخل بريدك الإلكتروني">
+                            <button type="button">اشترك الآن</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-morocco" class="spa-page">
+            <div class="section-headline"><h2>أخبار المغرب</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">تابع آخر الأخبار الوطنية، الاقتصادية والاجتماعية في المملكة المغربية أولاً بأول.</p>
+        </div>
+        <div id="page-world" class="spa-page">
+            <div class="section-headline"><h2>سياسة عالمية</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">تغطية شاملة ومستمرة لآخر الأحداث السياسية والملفات الدولية الكبرى حول العالم.</p>
+        </div>
+        <div id="page-tech" class="spa-page">
+            <div class="section-headline"><h2>ذكاء اصطناعي وبرمجة</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">كل ما يخص عالم التقنية، لغات البرمجة، وتطوير السكريبتات الذكية.</p>
+        </div>
+        <div id="page-games" class="spa-page">
+            <div class="section-headline"><h2>ألعاب إلكترونية وجيمينج</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">مراجعات، خطط تكتيكية، وأحدث أخبار منصات الألعاب والبطولات الرقمية.</p>
+        </div>
+        <div id="page-linux" class="spa-page">
+            <div class="section-headline"><h2>لينكس وسيرفرات</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">شروحات إعداد التوزيعات، إدارة السيرفرات، واستخدام أدوات الطرفية (Terminal).</p>
+        </div>
+        <div id="page-sports" class="spa-page">
+            <div class="section-headline"><h2>رياضة وكورة</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">مواعيد المباريات، تحليلات كروية، وأخبار انتقالات اللاعبين في الملاعب العالمية.</p>
+        </div>
+        <div id="page-art" class="spa-page">
+            <div class="section-headline"><h2>ثقافة وفن</h2></div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">مواضيع ثقافية، مراجعات أدبية وفنية، وتسليط الضوء على الإبداعات الشبابية.</p>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>حول "أشنو واقع"</h3>
+                <p>منصة إخبارية مستقلة تقدم تغطية شاملة وموضوعية لأهم الأحداث الوطنية والعالمية بكل احترافية وسرعة.</p>
+            </div>
+            <div class="footer-col">
+                <h3>أقسام المنصة</h3>
+                <ul class="footer-links">
+                    <li><a href="#">أخبار المغرب</a></li>
+                    <li><a href="#">سياسة عالمية</a></li>
+                    <li><a href="#">تقنية وعلوم</a></li>
+                    <li><a href="#">رياضة وكورة</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>روابط سريعة</h3>
+                <ul class="footer-links">
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                    <li><a href="#">شروط الاستخدام</a></li>
+                    <li><a href="#">اتصل بنا</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>تابعنا</h3>
+                <p>كن على اطلاع دائم بآخر المستجدات عبر منصاتنا الاجتماعية الموثقة.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 منصة "أشنو واقع" - جميع الحقوق محفوظة.</p>
+            <p>تم التطوير بواسطة إسماعيل - النسخة الرقمية العالمية</p>
+        </div>
+    </footer>
+
+    <script>
+        // السكريبت السحري للتحكم في الموقع
+        window.addEventListener('load', () => {
+            document.getElementById('preloader').classList.add('fade-out');
+        });
+
+        // تبديل الصفحات (SPA)
+        function switchPage(pageId) {
+            document.querySelectorAll('.spa-page').forEach(page => page.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const navId = 'nav-' + pageId;
+            if(document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+            document.getElementById('mobileSidebar').classList.remove('active');
+        }
+
+        // التبادل بين الوضع الليلي والنهاري
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const body = document.body;
+            body.dataset.theme = body.dataset.theme === 'light' ? 'dark' : 'light';
+            const icon = document.getElementById('themeIcon');
+            icon.style.fill = body.dataset.theme === 'light' ? '#12131a' : '#ffffff';
+        });
+
+        // تحكم القائمة الجانبية للهواتف
+        document.getElementById('burgerMenu').addEventListener('click', () => {
+            document.getElementById('mobileSidebar').classList.add('active');
+        });
+        document.getElementById('closeSidebar').addEventListener('click', () => {
+            document.getElementById('mobileSidebar').classList.remove('active');
+        });
+    </script>
 </body>
 </html>
 
