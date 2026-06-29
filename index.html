@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة القصص والأخبار العالمية</title>
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: #1a1d24;
+            --accent-color: #2ecc71;
+            --text-main: #ffffff;
+            --text-muted: #a0aec0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 40px;
+        }
+        header {
+            background-color: var(--card-bg);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-color);
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        header h1 { color: var(--accent-color); font-size: 24px; }
+        header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+        
+        /* قائمة القصص */
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .story-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .story-card:hover { transform: translateY(-5px); }
+        .story-img { width: 100%; height: 180px; object-fit: cover; }
+        .story-info { padding: 15px; }
+        .story-title { font-size: 18px; margin-bottom: 10px; color: #fff; }
+        .story-excerpt { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        
+        /* صفحة تفاصيل القصة */
+        .detail-page { display: none; background-color: var(--card-bg); border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .detail-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; }
+        .detail-title { font-size: 26px; color: var(--accent-color); margin-bottom: 15px; }
+        .detail-content { font-size: 16px; color: #e2e8f0; line-height: 1.8; text-align: justify; }
+        .btn-back {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📰 مجلة إسماعيل الكبرى للأخبار والقصص</h1>
+        <p>أقوى القصص العالمية والأخبار المثيرة متجددة على مدار الساعة</p>
+    </header>
+
+    <div class="container">
+        <!-- الواجهة الرئيسية (شبكة القصص) -->
+        <div id="main-view" class="stories-grid"></div>
+
+        <!-- واجهة تفاصيل القصة المفرَدة -->
+        <div id="detail-view" class="detail-page">
+            <div class="btn-back" onclick="showMainView()">⬅️ العودة للقائمة الرئيسية</div>
+            <img id="detail-img" class="detail-img" src="" alt="صورة القصة">
+            <h2 id="detail-title" class="detail-title"></h2>
+            <div id="detail-content" class="detail-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // بنك البيانات: 8 قصص منوعة بالكامل مع الصور دياولهم
+        const stories = [
+            {
+                id: 1,
+                title: "سر المدينة المفقودة تحت رمال الصحراء",
+                excerpt: "اكتشاف أثري مذهل لمدينة كاملة مدفونة يعود تاريخها لأكثر من 5000 سنة...",
+                image: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=600",
+                content: "نجح فريق دولي من علماء الآثار في الكشف عن مدينة أثرية ضخمة كانت مفقودة تحت الرمال لعدة قرون. المدينة تحتوي على قصور شاسعة، أسوار محصنة، وأدوات ذهبية مذهلة تشير إلى حضارة متطورة للغاية سكنت المنطقة قبل آلاف السنين. يعتقد الخبراء أن التغير المناخي السريع هو السبب وراء هجر هذه المدينة العظيمة وتغطيتها بالرمال بالكامل."
+            },
+            {
+                id: 2,
+                title: "الذكاء الاصطناعي يفك شفرة لغة الحيوانات",
+                excerpt: "علماء ينجحون في استخدام تقنيات متطورة لفهم لغة الحيتان والدلافين بدقة عالية...",
+                image: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=600",
+                content: "في خطوة علمية ثورية، تمكنت شركة برمجيات بالتعاون مع معاهد علوم البحار من تطوير نموذج ذكاء اصطناعي قادر على ترجمة الأصوات التي تصدرها الحيتان والدلافين إلى أنماط مفهومة للبشر. هذا الإنجاز سيفتح الباب لأول مرة في التاريخ للتواصل المباشر مع الكائنات الحية وفهم مشاعرها وتحذيراتها من المخاطر البيئية."
+            },
+            {
+                id: 3,
+                title: "رحلة الغواصة الشجاعة إلى أعمق نقطة في المحيط",
+                excerpt: "مغامرون يصلون لقاع خندق ماريانا ويكتشفون كائنات تضيء في الظلام لم تُر من قبل...",
+                image: "https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=600",
+                content: "تمكنت غواصة متطورة مأهولة من الهبوط بسلام إلى عمق 11 كيلومتراً تحت سطح البحر في خندق ماريانا. المغامرون أمضوا 4 ساعات في الظلام الدامس تحت ضغط هائل، واستطاعوا توثيق كائنات مجهرية وأسماك شفافة تماماً وتضيء ذاتياً بوسائل بيولوجية، مما يغير مفاهيمنا السابقة عن حدود الحياة على كوكب الأرض."
+            },
+            {
+                id: 4,
+                title: "رائد فضاء ضائع في مركبة تعود بعد 30 سنة",
+                excerpt: "قصة الخيال العلمي المثيرة حول إشارة غامضة استقبلتها الأرض من مركبة اعتقد الجميع أنها تحطمت...",
+                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600",
+                content: "في إطار من التشويق والإثارة، استقبلت محطة الفضاء الدولية إشارة رقمية مشفرة من مركبة فضائية قديمة اختفت في التسعينيات. المفاجأة كانت أن المركبة ما زالت تعمل وأن أنظمة الدعم الحيوي تسجل مؤشرات على وجود كائن حي بداخلها، مما أطلق سباقاً عالمياً لإطلاق رحلة إنقاذ عاجلة لمعرفة الحقيقة وراء هذا اللغز الفضائي."
+            },
+            {
+                id: 5,
+                title: "الرجل الذي عاش في المطار لمدة 20 عاماً",
+                excerpt: "قصة حقيقية ملهمة ومؤثرة عن الصبر والتحدي وعن صناعة وطن صغير وسط صخب المسافرين...",
+                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600",
+                content: "بسبب مشاكل قانونية معقدة وضياع أوراقه الرسمية، وجد هذا الرجل نفسه عالقاً في صالة الترانزيت بأحد أكبر مطارات العالم. بدلاً من الاستسلام، تحول إلى صديق لجميع الموظفين، وأصبح ينام على المقاعد ويقرأ الكتب ويعيش من مساعدات المسافرين، وصارت قصته رمزاً إنسانياً عالمياً ألهمت كبار مخرجي السينما."
+            },
+            {
+                id: 6,
+                title: "أكبر عملية إنقاذ لحيوانات الغابة من الفيضان",
+                excerpt: "تلاحم بطولي بين متطوعين محليين لإنقاذ المئات من الحيوانات النادرة بعد فيضان النهر...",
+                image: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600",
+                content: "شهدت المنطقة الاستوائية فيضاناً غير مسبوق هدد محمية طبيعية تضم فصائل نادرة. في حركة بطولية، تجمّع المئات من الشباب والمتطوعين مستخدمين قوارب صغيرة لإنقاذ الحيوانات العالقة فوق الأشجار وفي المناطق المرتفعة، وتمكنوا بنجاح من نقل أزيد من 500 حيوان إلى مراكز إيواء آمنة ووفروا لها الرعاية الطبية اللازمة."
+            },
+            {
+                id: 7,
+                title: "اكتشاف منجم ألماس عملاق في جبال الألب",
+                excerpt: "حدث اقتصادي يهز الأسواق العالمية بعد العثور على بلورات ألماس نقية ونادرة جداً...",
+                image: "https://images.unsplash.com/photo-1599256872237-5dcc0fbe966a?w=600",
+                content: "أعلنت شركة تنقيب عن مفاجأة كبرى أثناء قيامها بأعمال حفر روتينية في سلسلة جبال الألب، حيث عثرت على عروق ممتدة من الألماس الخام عالي النقاء. الخبراء يؤكدون أن هذا الاكتشاف سيعيد ترتيب موازين القوى الاقتصادية في سوق الأحجار الكريمة، وقد يؤدي إلى انخفاض الأسعار عالمياً بسبب الكميات الضخمة المكتشفة."
+            },
+            {
+                id: 8,
+                title: "البطل الصغير الذي أنقذ قريته من حريق هائل",
+                excerpt: "طفل لم يتجاوز 11 عاماً يستعمل ذكاءه وسرعته لتنبيه الجيران وإطفاء النيران قبل انتشارها...",
+                image: "https://images.unsplash.com/photo-1508873696983-2df519f0397e?w=600",
+                content: "تحول الطفل يوسف إلى بطل قومي في قريته الصغيرة بعد أن لاحظ اندلاع شرارة حريق في مستودع للأخشاب مجاور للمنازل. بفضل سرعة بديهته، لم يهرب بل قام بدق جرس الإنذار الخاص بالمدرسة القريبة لتنبيه السكان، وقام بقطع التيار الكهربائي العام بنفسه، مما منع وقوع كارثة حقيقية وأشاد به رجال الإطفاء."
+            }
+        ];
+
+        // عرض القصص في الصفحة الرئيسية
+        const mainView = document.getElementById('main-view');
+        stories.forEach(story => {
+            const card = document.createElement('div');
+            card.className = 'story-card';
+            card.onclick = () => showDetailView(story.id);
+            card.innerHTML = `
+                <img class="story-img" src="${story.image}" alt="${story.title}">
+                <div class="story-info">
+                    <h3 class="story-title">${story.title}</h3>
+                    <p class="story-excerpt">${story.excerpt}</p>
+                </div>
+            `;
+            mainView.appendChild(card);
+        });
+
+        // الانتقال لصفحة التفاصيل
+        function showDetailView(id) {
+            const story = stories.find(s => s.id === id);
+            if(story) {
+                document.getElementById('detail-img').src = story.image;
+                document.getElementById('detail-title').innerText = story.title;
+                document.getElementById('detail-content').innerText = story.content;
+                
+                document.getElementById('main-view').style.display = 'none';
+                document.getElementById('detail-view').style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // الرجوع للقائمة الرئيسية
+        function showMainView() {
+            document.getElementById('detail-view').style.display = 'none';
+            document.getElementById('main-view').style.display = 'grid';
+        }
+    </script>
+</body>
+</html>
