@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البث المباشر | أشنو واقع</title>
+    <style>
+        :root {
+            --bg-dark: #060608;
+            --bg-card: #111115;
+            --accent: #ff3e3e;
+            --accent-glow: rgba(255, 62, 62, 0.4);
+            --text-main: #ffffff;
+            --text-gray: #a0a0a5;
+            --success: #39ff14;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+
+        /* شريط علوي للرجوع للرئيسية */
+        .back-bar { background: #000; padding: 12px 5%; display: flex; align-items: center; border-bottom: 1px solid #1c1c24; }
+        .btn-back { background: var(--bg-card); color: #fff; border: 1px solid #2c2c3a; padding: 6px 15px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold; transition: 0.3s; }
+        .btn-back:hover { background: var(--accent); border-color: var(--accent); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px 5%; }
+
+        /* منطقة المشغل الفخم (Cinematic Video Player Wrapper) */
+        .player-container { background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #1f1f26; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(255,62,62,0.1); margin-bottom: 30px; position: relative; }
+        video { width: 100%; display: block; aspect-ratio: 16/9; max-height: 550px; background: #000; }
+
+        /* تفاصيل الماتش المباشر */
+        .live-details { background: var(--bg-card); border: 1px solid #1f1f26; padding: 20px; border-radius: 14px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
+        .live-title-box h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
+        .live-status-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(57, 255, 20, 0.1); color: var(--success); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(57,255,20,0.2); }
+        .live-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        /* شبكة القنوات الإحترافية (Premium IPTV Grid) */
+        .channels-section { margin-top: 30px; }
+        .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; border-right: 4px solid var(--accent); padding-right: 10px; text-shadow: 0 0 10px rgba(255, 62, 62, 0.2); }
+        
+        .channels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 18px; }
+        
+        .channel-card { 
+            background: var(--bg-card); 
+            border: 1px solid #1f1f26; 
+            border-radius: 14px; 
+            padding: 22px 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* تأثير التوهج عند تمرير الفأرة أو اللمس */
+        .channel-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,62,62,0.1), transparent);
+            opacity: 0;
+            transition: 0.3s;
+        }
+        
+        .channel-card:hover::before { opacity: 1; }
+        
+        .channel-card:hover { 
+            border-color: var(--accent); 
+            transform: translateY(-5px); 
+            box-shadow: 0 12px 25px rgba(255, 62, 62, 0.15); 
+        }
+        
+        .channel-icon { 
+            font-size: 2.5rem; 
+            margin-bottom: 12px; 
+            display: inline-block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+        .channel-card:hover .channel-icon { transform: scale(1.1) rotate(5deg); }
+        
+        .channel-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); block; }
+        .channel-category { font-size: 0.75rem; color: var(--text-gray); margin-top: 4px; display: block; font-weight: 600; }
+
+        /* ستايل أزرار التحكم في الصوت والجودة الافتراضية داخل الـ Player */
+        video::-webkit-media-controls-panel { background-image: linear-gradient(transparent, rgba(0,0,0,0.9)) !important; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+    <div class="back-bar">
+        <a href="index.html" class="btn-back">⬅️ الرجوع للرئيسية</a>
+    </div>
+
+    <div class="container">
+        
+        <div class="player-container">
+            <video id="mainPlayer" controls autoplay playsinline poster="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200"></video>
+        </div>
+
+        <div class="live-details">
+            <div class="live-title-box">
+                <span class="live-status-tag"><span class="live-dot"></span> جاري البث الآن بجودة عالية</span>
+                <h2 id="currentStreamTitle" style="margin-top: 10px;">إختر قناة من الأسفل لبدء البث المباشر</h2>
+            </div>
+        </div>
+
+        <div class="channels-section">
+            <h3 class="section-title">القنوات الرياضية والإخبارية الحية 📺</h3>
+            <div class="channels-grid">
+                
+                <div class="channel-card" onclick="changeChannel('https://rtmp.marocstream.com/live/snrt_الاولى.m3u8', 'القناة الأولى المغربية HD')">
+                    <span class="channel-icon">🇲🇦</span>
+                    <span class="channel-name">الأولى المغربية</span>
+                    <span class="channel-category">وطنية</span>
+                </div>
+
+                <div class="channel-card" onclick="changeChannel('https://rtmp.marocstream.com/live/snrt_الرياضية.m3u8', 'قناة الرياضية المغربية مباشر')">
+                    <span class="channel-icon">⚽</span>
+                    <span class="channel-name">الرياضية HD</span>
+                    <span class="channel-category">رياضة</span>
+                </div>
+
+                <div class="channel-card" onclick="changeChannel('https://aljazeera-ara-apple-live.akamaized.net/content/ch/ara/live.m3u8', 'قناة الجزيرة الإخبارية مباشر')">
+                    <span class="channel-icon">📰</span>
+                    <span class="channel-name">الجزيرة مباشر</span>
+                    <span class="channel-category">أخبار</span>
+                </div>
+
+                <div class="channel-card" onclick="changeChannel('https://bbc-live-emu.akamaized.net/hls/live/2034074/bbc_arabic_tv/index.m3u8', 'قناة BBC العربية مباشر')">
+                    <span class="channel-icon">🌍</span>
+                    <span class="channel-name">BBC عربي</span>
+                    <span class="channel-category">أخبار</span>
+                </div>
+
+                <div class="channel-card" onclick="changeChannel('https://mbc-live.akamaized.net/hls/live/2034000/mbc1/index.m3u8', 'قناة MBC 1 مباشر')">
+                    <span class="channel-icon">🎬</span>
+                    <span class="channel-name">MBC 1</span>
+                    <span class="channel-category">منوعات</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <script>
+        const player = document.getElementById('mainPlayer');
+        const streamTitle = document.getElementById('currentStreamTitle');
+        let currentHlsInstance = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        // دالة سحرية لتهيئة مشغل الفيديو بنظام الحماية والسرعة القصوى
+        function changeChannel(url, title) {
+            // تحديث العنوان وتخزين الاختيار في ذاكرة المتصفح الذكية
+            streamTitle.innerHTML = `<span class="live-dot"></span> جاري الاتصال بـ: ${title}`;
+            localStorage.setItem('last_watched_channel', url);
+            localStorage.setItem('last_watched_title', title);
+            
+            // إضافة تأثير سينمائي وتعتيم المشغل أثناء الشحن
+            player.style.filter = 'blur(5px) grayscale(50%)';
+            player.style.transition = 'all 0.4s ease';
+
+            // تدمير أي بث قديم لتفادي ثقل التليفون وتداخل الأصوات
+            if (currentHlsInstance) {
+                currentHlsInstance.destroy();
+                currentHlsInstance = null;
+            }
+
+            // 1. إذا كان المتصفح يدعم تقنية HLS.js العالمية (أندرويد، حواسيب، إلخ)
+            if (Hls.isSupported()) {
+                const config = {
+                    maxBufferSize: 30 * 1024 * 1024, // 30 ميغابايت لتفادي التقطيع تماماً
+                    maxBufferLength: 20,
+                    enableWorker: true,
+                    lowLatencyMode: true, // تقنية البث المباشر الفوري بدون تأخير عن التلفزة
+                    backBufferLength: 10
+                };
+
+                const hls = new Hls(config);
+                currentHlsInstance = hls; // حفظ النسخة الحالية للحساب
+                
+                hls.loadSource(url);
+                hls.attachMedia(player);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    reconnectAttempts = 0; // تصفير محاولات الفشل عند النجاح
+                    player.style.filter = 'none';
+                    player.play().catch(() => {
+                        console.log("تم كتم الصوت مؤقتاً لتفعيل التشغيل التلقائي");
+                        player.muted = true;
+                        player.play();
+                    });
+                });
+
+                // نظام الإنقاذ التلقائي عند انقطاع السيرفر أو ضعف الإنترنت عند الزائر
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                if (reconnectAttempts < maxReconnectAttempts) {
+                                    reconnectAttempts++;
+                                    streamTitle.innerHTML = `⚠️ انقطاع في الشبكة... محاولة إعادة الاتصال (${reconnectAttempts}/${maxReconnectAttempts})`;
+                                    setTimeout(() => hls.startLoad(), 2000); // إعادة المحاولة كل ثانيتين
+                                } else {
+                                    streamTitle.innerHTML = `❌ عذراً، السيرفر ممتلئ حالياً. إختر قناة أخرى.`;
+                                    player.style.filter = 'blur(10px)';
+                                }
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.log("خطأ في قراءة الترميز، جاري إصلاح الفريمات...");
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                initDefaultSafetyFallback(url); // الانتقال لنظام الأمان الاحتياطي
+                                break;
+                        }
+                    }
+                });
+
+            } 
+            // 2. نظام الأمان الاحتياطي للهواتف التي تدعم البث الحركي داخلياً (مثل آيفون وسافاري)
+            else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+                initDefaultSafetyFallback(url);
+            }
+        }
+
+        // نظام التشغيل المباشر الاحتياطي (Native Fallback)
+        function initDefaultSafetyFallback(url) {
+            player.src = url;
+            player.addEventListener('loadedmetadata', function() {
+                player.style.filter = 'none';
+                player.play();
+            });
+            player.addEventListener('error', function() {
+                streamTitle.innerHTML = `❌ خطأ في تشغيل القناة، جاري الانتقال للسورس الاحتياطي...`;
+            });
+        }
+
+        // محرك البحث والربط الذكي وفك التشفير بين الصفحات (URL Router)
+        function loadSmartRouter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const matchName = urlParams.get('match');
+            
+            if (matchName) {
+                // إذا كليكا الزائر على ماتش فالصفحة الرئيسية، كنعطيوه الرياضية كخيار أول للمباراة
+                changeChannel('https://rtmp.marocstream.com/live/snrt_الرياضية.m3u8', 'بث مباشر: ' + matchName);
+            } else {
+                // إذا دخل السيت نيشان، غايشوف الذاكرة واش كاين شي قناة تفرج فيها البارح يكمل فيها
+                const lastUrl = localStorage.getItem('last_watched_channel');
+                const lastTitle = localStorage.getItem('last_watched_title');
+                
+                if (lastUrl && lastTitle) {
+                    changeChannel(lastUrl, lastTitle + " (متابعة المشاهدة)");
+                } else {
+                    // إذا كان جديد أول مرة يدخل، كنشغلو الأولى المغربية تلقائياً
+                    changeChannel('https://rtmp.marocstream.com/live/snrt_الاولى.m3u8', 'القناة الأولى المغربية HD');
+                }
+            }
+        }
+
+        // تشغيل الترسانة البرمجية كاملة فور جاهزية الصفحة
+        document.addEventListener("DOMContentLoaded", function() {
+            loadSmartRouter();
+        });
+    </script>
+</body>
+</html>
+
